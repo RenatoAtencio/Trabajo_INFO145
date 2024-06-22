@@ -23,8 +23,6 @@ Realizar una busqueda binaria sobre un arreglo X *creciente*, se debe probar con
 Tener en cuenta que debe ser modular, tener comentarios, y que sea de calidad
 
  *Inicio*
- + Crear Arreglo lineal: A[0] = rand(), A[i] = A[i-1] + rand() % ε
- + Crear Arreglo Normal: Se pueden usar librerias
  + Realizar busqueda binaria sobre esos arreglos y medir tiempos, se debe de calcular el tiempo teorico y el experimental
  
  *Gap_Coding*
@@ -49,4 +47,5 @@ Tener en cuenta que debe ser modular, tener comentarios, y que sea de calidad
 
 ## DONE
 Poner aca las tareas del TODO hechas
- + 
+ + Crear Arreglo lineal: A[0] = rand(), A[i] = A[i-1] + rand() % ε
+ + Crear Arreglo Normal: Se pueden usar librerias
