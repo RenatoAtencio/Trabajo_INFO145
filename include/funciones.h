@@ -15,6 +15,7 @@ double tiempo_binary_search(int largo_arreglo, int* Arr, int numero_buscado);
 void crear_ArrLineal(int largo_arreglo, int *Arr, int epsilon);
 void crear_ArrNormal(int largo_arreglo, int *Arr, double mean, double stddev);
 void gap_Coding(int *Arr, int *gapArr, int largo_arreglo);
+void sample_Array(int *Arr, int *sample_Arr, int m, int b);
 void print_Arr(int largo_arreglo, int *Arr);
 
 // metodos_archivos.cpp

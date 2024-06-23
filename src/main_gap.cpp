@@ -2,6 +2,7 @@
 #include <iostream>
 #include <chrono>
 #include <iomanip>
+#include <cmath>
 #include "../include/funciones.h"
 
 using namespace std;
@@ -19,6 +20,9 @@ int main(int argc, char** argv) {
 
     int iteraciones = 1;  // Pasarlo como var de entorno
 
+    int m = static_cast<int>(log2(largo_arreglo)); //Largo del array sample
+    int b = largo_arreglo/m; //salto entre los elementos del array original que habra en el sample
+
     // Vector de los resultados(tiempos) de la busqueda
     vector<double> resultados_lineal;   
     vector<double> resultados_normal;   
@@ -31,6 +35,8 @@ int main(int argc, char** argv) {
         int* Arr_normal = new int[largo_arreglo];
         int *gap_Arr_lineal = new int[largo_arreglo];
         int *gap_Arr_normal = new int[largo_arreglo];
+        int *sample_ArrLineal = new int[m];
+        int *sample_ArrNormal = new int[m];
 
         int epsilon = 10;       // Pasarlo como var de entorno
         crear_ArrLineal(largo_arreglo, Arr_lineal, epsilon);
@@ -50,7 +56,15 @@ int main(int argc, char** argv) {
         //arrays lineal y normal con el gap
         gap_Coding(Arr_lineal, gap_Arr_lineal, largo_arreglo);
         gap_Coding(Arr_normal, gap_Arr_normal, largo_arreglo);
+
+        //array sample lineal
+        sample_Array(Arr_lineal,sample_ArrLineal, m, b);
         
+        //array sample normal
+        sample_Array(Arr_normal,sample_ArrNormal, m, b);
+        
+
+
         //mostrar array gap lineal normal
         cout<<"arrayLinealGap = ";
         print_Arr(largo_arreglo, gap_Arr_lineal);
