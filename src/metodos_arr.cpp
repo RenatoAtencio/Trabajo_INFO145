@@ -46,7 +46,7 @@ void print_Arr(int largo_arreglo, int *Arr){
 void sample_Array(int *Arr, int *sample_Arr, int m, int b){
     sample_Arr[0] = Arr[0];
     for(int i = 1; i < m; i++){
-        sample_Arr[i] = Arr[b];
+        sample_Arr[i] = Arr[i]+b;
 
     }
 }

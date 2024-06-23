@@ -59,6 +59,8 @@ int main(int argc, char** argv) {
 
         //array sample lineal
         sample_Array(Arr_lineal,sample_ArrLineal, m, b);
+        cout<<"Array lineal sample = ";
+        print_Arr(m,sample_ArrLineal);
         
         //array sample normal
         sample_Array(Arr_normal,sample_ArrNormal, m, b);
@@ -66,10 +68,10 @@ int main(int argc, char** argv) {
 
 
         //mostrar array gap lineal normal
-        cout<<"arrayLinealGap = ";
-        print_Arr(largo_arreglo, gap_Arr_lineal);
+        //cout<<"arrayLinealGap = ";
+        //print_Arr(largo_arreglo, gap_Arr_lineal);
 
-        cout<<endl;
+        //cout<<endl;
         
         //cout<<"arrayNormalGap";
         //print_Arr(largo_arreglo, gap_Arr_normal);
