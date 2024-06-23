@@ -12,6 +12,7 @@ int binary_Search(int arr[], int size, int key);
 // metodos_arr.cpp
 void crear_ArrLineal(int largo_arreglo, int *Arr, int epsilon);
 void crear_ArrNormal(int largo_arreglo, int *Arr, double mean, double stddev);
+void gap_Coding(int *Arr, int *gapArr, int largo_arreglo);
 void print_Arr(int largo_arreglo, int *Arr);
 
 // metodos_archivos.cpp

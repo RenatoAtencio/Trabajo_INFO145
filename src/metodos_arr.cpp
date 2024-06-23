@@ -28,6 +28,14 @@ void crear_ArrNormal(int largo_arreglo, int *Arr, double mean, double stddev){
     sort(Arr, Arr + largo_arreglo);
 }
 
+void gap_Coding(int *Arr, int *gapArr, int largo_arreglo){
+    gapArr[0] = Arr[0];
+    for(int i = 0; i < largo_arreglo; i++){
+        gapArr[i] = Arr[i] - Arr[i-1];
+    }
+
+}
+
 void print_Arr(int largo_arreglo, int *Arr){
     for (int i = 0; i < largo_arreglo; i++){
         cout << Arr[i] << " ";
