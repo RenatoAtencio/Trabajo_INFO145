@@ -3,10 +3,30 @@
 #include <sstream>
 #include <vector>
 #include <fstream>
+#include <chrono>
+#include <iomanip>
 
 #include "../include/funciones.h"
 
 using namespace std;
+
+// Crea el path+file_name para los archivos de salida
+string crear_file_name(){
+    const char* user_env = std::getenv("USER");
+    if (!user_env) {
+        user_env = "user";
+    }
+
+    string titulo = "Tests";
+
+    auto now = std::chrono::system_clock::now();
+    auto in_time_t = std::chrono::system_clock::to_time_t(now);
+    stringstream ss;
+    ss << put_time(std::localtime(&in_time_t), "%Y-%m-%d %Hh-%Mm-%Ss");
+
+    string path = "out/" + titulo + " - " + string(user_env) + " - " + ss.str() + ".csv";
+    return path;
+};
 
 void crear_archivo_txt(const string& path) {
     ofstream myfile;

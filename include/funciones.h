@@ -8,6 +8,8 @@ using namespace std;
 
 // binary_search.cpp
 int binary_Search(int arr[], int size, int key);
+void validarM(int success_binary_search, int numero_buscado);
+double tiempo_binary_search(int largo_arreglo, int* Arr, int numero_buscado);
 
 // metodos_arr.cpp
 void crear_ArrLineal(int largo_arreglo, int *Arr, int epsilon);
@@ -19,5 +21,6 @@ void print_Arr(int largo_arreglo, int *Arr);
 void crear_archivo_txt(const string& path);
 void escribir_resultados(const vector<double>& resultados, const string& path, int largo_arreglo, int numero_buscado, const string& tipo_arr);
 void escribir_resultados_csv(const vector<double>& resultados_lineal,const vector<double>& resultados_normal, const string& path, int largo_arreglo, int numero_buscado);
+string crear_file_name();
 
 #endif // FUNCIONES_H

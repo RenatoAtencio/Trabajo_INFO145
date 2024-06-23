@@ -30,7 +30,7 @@ void crear_ArrNormal(int largo_arreglo, int *Arr, double mean, double stddev){
 
 void gap_Coding(int *Arr, int *gapArr, int largo_arreglo){
     gapArr[0] = Arr[0];
-    for(int i = 0; i < largo_arreglo; i++){
+    for(int i = 1; i < largo_arreglo; i++){
         gapArr[i] = Arr[i] - Arr[i-1];
     }
 
