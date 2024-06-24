@@ -51,3 +51,25 @@ void sample_Array(int *Arr, int *sample_Arr, int m, int b){
         indice = indice + b;
     }
 }
+
+int search_in_gap(int *Arr_gap, int num_buscado, int num_inicio, int index_inicio, int index_fin ,int largo_arreglo){
+    if (index_inicio <= -1){
+        index_inicio = 0;
+    }
+    if (index_fin <= -1){
+        index_fin = largo_arreglo-1 ;
+    }
+    if (num_buscado == num_inicio){
+        return index_inicio;
+    }
+
+    for ( int i = index_inicio + 1 ; i <= index_fin ; i++){
+        num_inicio += Arr_gap[i];
+        if (num_buscado == num_inicio){
+            cout << "Numero encontrado" << endl;
+            return i;
+        }
+    }
+    cout << "Numero no encontrado" << endl;
+    return -1;
+}

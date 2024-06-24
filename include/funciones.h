@@ -18,6 +18,7 @@ void crear_ArrNormal(int largo_arreglo, int *Arr, double mean, double stddev);
 void gap_Coding(int *Arr, int *gapArr, int largo_arreglo);
 void sample_Array(int *Arr, int *sample_Arr, int m, int b);
 void print_Arr(int largo_arreglo, int *Arr);
+int search_in_gap(int *Arr_gap, int num_buscado, int num_inicio, int index_inicio, int index_fin ,int largo_arreglo);
 
 // metodos_archivos.cpp
 void crear_archivo_txt(const string& path);

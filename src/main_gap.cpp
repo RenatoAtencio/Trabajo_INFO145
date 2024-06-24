@@ -64,13 +64,11 @@ int main(int argc, char** argv) {
         cout << "m,b: " << m << " " << b << endl;
         cout << "indices arreglo: " << intervalo.first*b << " " << intervalo.second*b << endl;
         cout << "Intervalo arreglo: " << Arr_lineal[intervalo.first*b] << " " << Arr_lineal[intervalo.second*b] << endl;
-        
 
-        // Busqueda arreglo lineal
-        resultados_lineal.push_back(tiempo_binary_search(largo_arreglo, Arr_lineal, numero_buscado));
+        int success = search_in_gap(gap_Arr_lineal,numero_buscado,sample_ArrLineal[intervalo.first],intervalo.first*b,intervalo.second*b,largo_arreglo);
+        cout << success << endl;
 
-        // Busqueda arreglo normal
-        resultados_normal.push_back(tiempo_binary_search(largo_arreglo, Arr_normal, numero_buscado));
+
 
         delete[] Arr_lineal;
         delete[] Arr_normal;
