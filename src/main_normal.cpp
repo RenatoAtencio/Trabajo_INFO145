@@ -36,6 +36,14 @@ int main(int argc, char** argv) {
         double stddev = 5.0;    // Pasarlo como var de entorno
         crear_ArrNormal(largo_arreglo, Arr_normal, mean, stddev);
 
+        print_Arr(largo_arreglo,Arr_lineal);
+
+        cout << endl;
+
+        pair<int,int> intervalo = binary_Search_Intervalos(Arr_lineal,largo_arreglo,-1);
+
+        cout << Arr_lineal[intervalo.first] << " " << Arr_lineal[intervalo.second] << endl;
+
         // Busqueda arreglo lineal
         resultados_lineal.push_back(tiempo_binary_search(largo_arreglo, Arr_lineal, numero_buscado));
 

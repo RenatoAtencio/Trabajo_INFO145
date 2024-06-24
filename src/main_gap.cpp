@@ -44,37 +44,26 @@ int main(int argc, char** argv) {
         double stddev = 5.0;    // Pasarlo como var de entorno
         crear_ArrNormal(largo_arreglo, Arr_normal, mean, stddev);
 
-        //mostrar arrays lineal y normal
-        cout<<"arrayLineal = ";
-        print_Arr(largo_arreglo, Arr_lineal);
-
-        cout<<endl;
-
-        //cout<<"arrayNotmal = ";
-        //print_Arr(largo_arreglo, Arr_normal);
-
         //arrays lineal y normal con el gap
         gap_Coding(Arr_lineal, gap_Arr_lineal, largo_arreglo);
         gap_Coding(Arr_normal, gap_Arr_normal, largo_arreglo);
 
-        //array sample lineal
+        //array sample lineal y normal
         sample_Array(Arr_lineal,sample_ArrLineal, m, b);
-        cout<<"Array lineal sample = ";
-        print_Arr(m,sample_ArrLineal);
-        
-        //array sample normal
         sample_Array(Arr_normal,sample_ArrNormal, m, b);
-        
 
+        cout<<"arreglo lineal : "; print_Arr(largo_arreglo,Arr_lineal); cout<<endl;
+        cout<<"arreglo gap    : "; print_Arr(largo_arreglo,gap_Arr_lineal); cout<<endl;
+        cout<<"arreglo sample : "; print_Arr(m,sample_ArrLineal); cout<<endl;
 
-        //mostrar array gap lineal normal
-        //cout<<"arrayLinealGap = ";
-        //print_Arr(largo_arreglo, gap_Arr_lineal);
+        cout << "numero buscado : " << numero_buscado << endl;
 
-        //cout<<endl;
-        
-        //cout<<"arrayNormalGap";
-        //print_Arr(largo_arreglo, gap_Arr_normal);
+        pair<int,int> intervalo = binary_Search_Intervalos(sample_ArrLineal,m,numero_buscado);
+
+        cout << "Indices sample: " << intervalo.first << " " << intervalo.second << endl;
+        cout << "m,b: " << m << " " << b << endl;
+        cout << "indices arreglo: " << intervalo.first*b << " " << intervalo.second*b << endl;
+        cout << "Intervalo arreglo: " << Arr_lineal[intervalo.first*b] << " " << Arr_lineal[intervalo.second*b] << endl;
         
 
         // Busqueda arreglo lineal

@@ -10,6 +10,7 @@ using namespace std;
 int binary_Search(int arr[], int size, int key);
 void validarM(int success_binary_search, int numero_buscado);
 double tiempo_binary_search(int largo_arreglo, int* Arr, int numero_buscado);
+pair<int, int> binary_Search_Intervalos(int arr[], int largo_arr, int num);
 
 // metodos_arr.cpp
 void crear_ArrLineal(int largo_arreglo, int *Arr, int epsilon);
