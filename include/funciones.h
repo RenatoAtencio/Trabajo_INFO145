@@ -23,7 +23,11 @@ int search_in_gap(int *Arr_gap, int num_buscado, int num_inicio, int index_inici
 // metodos_archivos.cpp
 void crear_archivo_txt(const string& path);
 void escribir_resultados(const vector<double>& resultados, const string& path, int largo_arreglo, int numero_buscado, const string& tipo_arr);
-void escribir_resultados_csv(const vector<double>& resultados_lineal,const vector<double>& resultados_normal, const string& path, int largo_arreglo, int numero_buscado);
+void escribir_resultados_csv(const vector<double>& resultados_lineal,const vector<double>& resultados_normal, const string& path, int largo_arreglo);
 string crear_file_name();
+
+// metodos_var_entorno.cpp
+int get_env_int(const char* var_name);
+double get_env_double(const char* var_name);
 
 #endif // FUNCIONES_H

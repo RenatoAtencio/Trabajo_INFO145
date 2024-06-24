@@ -11,3 +11,8 @@ crear carpeta out
 sizeof(int *) = 4 o 8 bytes, 4 si es sistema operativo de 32 bits, 8 si es de 64 bits.
 
 1 byte = 8 bits 
+
+hacer numero random dependiente del rango del arreglo
+
+set -o allexport 
+source config/.env

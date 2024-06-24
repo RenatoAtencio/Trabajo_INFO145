@@ -48,11 +48,11 @@ void escribir_resultados(const vector<double>& resultados, const string& path, i
     myfile.close();
 }
 
-void escribir_resultados_csv(const vector<double>& resultados_lineal,const vector<double>& resultados_normal, const string& path, int largo_arreglo, int numero_buscado) {
+void escribir_resultados_csv(const vector<double>& resultados_lineal,const vector<double>& resultados_normal, const string& path, int largo_arreglo) {
     ofstream myfile;
     myfile.open(path);
     if (myfile.is_open()) {
-        myfile << "Resultados arreglos con: n=" << largo_arreglo << " y num=" << numero_buscado << "\n";
+        myfile << "Resultados arreglos con: n=" << largo_arreglo << " y num_buscado=random(rango_intervalo) \n";
         myfile << "Iteracion,Tiempo_lineal (ns),Tiempo_normal (ns)\n";  // Cabecera del CSV
         for (size_t i = 0; i < resultados_lineal.size(); i++) {
             myfile << i+1 << "," << resultados_lineal[i] << "," << resultados_normal[i] << "\n";

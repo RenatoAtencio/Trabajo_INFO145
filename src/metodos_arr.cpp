@@ -66,10 +66,10 @@ int search_in_gap(int *Arr_gap, int num_buscado, int num_inicio, int index_inici
     for ( int i = index_inicio + 1 ; i <= index_fin ; i++){
         num_inicio += Arr_gap[i];
         if (num_buscado == num_inicio){
-            cout << "Numero encontrado" << endl;
+            // cout << "Numero encontrado" << endl;
             return i;
         }
     }
-    cout << "Numero no encontrado" << endl;
+    // cout << "Numero no encontrado" << endl;
     return -1;
 }

@@ -54,6 +54,6 @@ int main(int argc, char** argv) {
         delete[] Arr_normal;
     }
 
-    escribir_resultados_csv(resultados_lineal,resultados_normal, path, largo_arreglo, numero_buscado);
+    escribir_resultados_csv(resultados_lineal,resultados_normal, path, largo_arreglo);
     return 0;
 }
