@@ -18,6 +18,9 @@ int main(int argc, char** argv) {
         cout << "Entrada debe ser ./binaryS largo_arreglo" << endl;
         exit(1);
     }
+
+    // Asegurar que el largo sea mayor a 0
+
     srand(time(nullptr));  
 
     int largo_arreglo = atoi(argv[1]);

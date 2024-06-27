@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <iostream>
+#include <bitset>
 
 #include "../include/funciones.h"
 
@@ -68,8 +69,43 @@ int search_in_gap(int *Arr_gap, int num_buscado, int num_inicio, int index_inici
         if (num_buscado == num_inicio){
             // cout << "Numero encontrado" << endl;
             return i;
+        }else if (num_buscado < num_inicio){
+            // cout << "Numero no encontrado" << endl;
+            return -1;
         }
     }
     // cout << "Numero no encontrado" << endl;
     return -1;
 }
+
+int search_in_gap_codificado(map<int, string> canonicalCodes,char *arr_gap_comprimido, int num_buscado, int num_inicio, int index_inicio, int index_fin ,int largo_arreglo){
+    map<string, int> reversed;
+
+    for (map<int, string>::iterator i = canonicalCodes.begin(); i != canonicalCodes.end(); ++i)
+        reversed[i->second] = i->first;
+    
+    if (index_inicio <= -1){
+        index_inicio = 0;
+    }
+    if (index_fin <= -1){
+        index_fin = largo_arreglo-1 ;
+    }
+    if (num_buscado == num_inicio){
+        return index_inicio;
+    }
+
+    for ( int i = index_inicio + 1 ; i <= index_fin ; i++){
+
+        string s{(bitset<4>(arr_gap_comprimido[i])).to_string()};
+        
+        cout << "i: " << i << " " <<(bitset<4>(arr_gap_comprimido[i])).to_string() << " " <<reversed[s] << endl;
+
+        num_inicio += reversed[s];
+        if (num_buscado == num_inicio){
+            cout << "Numero encontrado" << endl;
+            return i;
+        }
+    }
+    cout << "Numero no encontrado" << endl;
+    return -1;
+}  

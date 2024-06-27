@@ -6,6 +6,7 @@
 
 using namespace std::chrono;
 
+// Clase para los intervalos de tiempo
 class Time_Interval {
 public:
     // Contructor

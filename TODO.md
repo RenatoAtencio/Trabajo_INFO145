@@ -23,7 +23,7 @@ Realizar una busqueda binaria sobre un arreglo X *creciente*, se debe probar con
 Tener en cuenta que debe ser modular, tener comentarios, y que sea de calidad
 
  *Inicio*
- + Realizar busqueda binaria sobre esos arreglos y medir tiempos, se debe de calcular el tiempo teorico y el experimental
+ + Realizar busqueda binaria sobre esos arreglos y medir tiempos, se debe de calcular el *tiempo teorico* y el experimental
  
  *Gap_Coding*
  La idea del gap coding es usar 2 arreglos auxiliares:
@@ -35,11 +35,6 @@ Tener en cuenta que debe ser modular, tener comentarios, y que sea de calidad
     En el sample se hace la busqueda binaria para encontrar el *intervalo* en el cual el numero *podria* estar (Se devuelve el intervalo y el *numero inicial*). Una vez con estos indices se puede usar b para transformalos en indices de CG(X)
     Una vez con ese intervalo de GC se puede sumar al numero hasta llegar al numero buscado.
 
- + Funcion para calcular GC(X)
- + Funcion para calcular el Sample, dado un m y un b (Recordar que m y b es establecido por nosotros)
- + Funcion para obtener el indice y el numero inicial del Sample (Modificacion de la busqueda binaria)
- + Funcion para recorrer GC(X) con el numero obtenido y desde el indice obtenido. Si no se encuentra (suma > um_buscado) se sale simplemente.
-
  *Gap-Coding Codificado*
  Para estos se puede usar Huffman o Shannon-Fano
  Ahora para ahorrar espacio se debe pasar el arreglo GC(X) a codigos. 
@@ -49,3 +44,7 @@ Tener en cuenta que debe ser modular, tener comentarios, y que sea de calidad
 Poner aca las tareas del TODO hechas
  + Crear Arreglo lineal: A[0] = rand(), A[i] = A[i-1] + rand() % ε
  + Crear Arreglo Normal: Se pueden usar librerias
+ + Funcion para calcular GC(X)
+ + Funcion para calcular el Sample, dado un m y un b (Recordar que m y b es establecido por nosotros)
+ + Funcion para obtener el indice y el numero inicial del Sample (Modificacion de la busqueda binaria)
+ + Funcion para recorrer GC(X) con el numero obtenido y desde el indice obtenido. Si no se encuentra (suma > um_buscado) se sale simplemente.

@@ -16,3 +16,9 @@ hacer numero random dependiente del rango del arreglo
 
 set -o allexport 
 source config/.env
+
+char: 1byte = 4 bits = 16 codigos de huffman
+int: 4 bytes = 32 bits =	4.3M codigos de huffman
+int*: 8 bytes = 64 bits = 18x10^18 codigos de huffman
+long: 8 bytes = 64 bits = 18x10^18 codigos de huffman
+short int: 2 bytes = 8 bits = 65536 codigos de huffman
