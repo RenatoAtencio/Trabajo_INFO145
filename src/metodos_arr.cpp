@@ -78,10 +78,10 @@ int search_in_gap(int *Arr_gap, int num_buscado, int num_inicio, int index_inici
     return -1;
 }
 
-int search_in_gap_codificado(map<int, string> canonicalCodes,char *arr_gap_comprimido, int num_buscado, int num_inicio, int index_inicio, int index_fin ,int largo_arreglo){
-    map<string, int> reversed;
+int search_in_gap_codificado(unordered_map<int, string> canonicalCodes,char *arr_gap_comprimido, int num_buscado, int num_inicio, int index_inicio, int index_fin ,int largo_arreglo){
+    unordered_map<string, int> reversed;
 
-    for (map<int, string>::iterator i = canonicalCodes.begin(); i != canonicalCodes.end(); ++i)
+    for (unordered_map<int, string>::iterator i = canonicalCodes.begin(); i != canonicalCodes.end(); ++i)
         reversed[i->second] = i->first;
     
     if (index_inicio <= -1){
@@ -96,9 +96,9 @@ int search_in_gap_codificado(map<int, string> canonicalCodes,char *arr_gap_compr
 
     for ( int i = index_inicio + 1 ; i <= index_fin ; i++){
 
-        string s{(bitset<4>(arr_gap_comprimido[i])).to_string()};
+        string s{(bitset<8>(arr_gap_comprimido[i])).to_string()};
         
-        cout << "i: " << i << " " <<(bitset<4>(arr_gap_comprimido[i])).to_string() << " " <<reversed[s] << endl;
+        // cout << "i: " << i << " " <<(bitset<8>(arr_gap_comprimido[i])).to_string() << " " <<reversed[s] << endl;
 
         num_inicio += reversed[s];
         if (num_buscado == num_inicio){

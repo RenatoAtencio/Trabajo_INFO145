@@ -21,7 +21,7 @@ void gap_Coding(int *Arr, int *gapArr, int largo_arreglo);
 void sample_Array(int *Arr, int *sample_Arr, int m, int b);
 void print_Arr(int largo_arreglo, int *Arr);
 int search_in_gap(int *Arr_gap, int num_buscado, int num_inicio, int index_inicio, int index_fin ,int largo_arreglo);
-int search_in_gap_codificado(map<int, string> canonicalCodes,char *arr_gap_comprimido, int num_buscado, int num_inicio, int index_inicio, int index_fin ,int largo_arreglo);
+int search_in_gap_codificado(unordered_map<int, string> canonicalCodes,char *arr_gap_comprimido, int num_buscado, int num_inicio, int index_inicio, int index_fin ,int largo_arreglo);
 
 // metodos_archivos.cpp
 void crear_archivo_txt(const string& path);
@@ -57,7 +57,7 @@ int codigo_mas_largo(const unordered_map<int, string>& huffmanCodes);
 Nodo_Huffman* crear_arbol_huffman(vector<Nodo_Huffman*>& nodos);
 void crear_codigos_huffman(Nodo_Huffman* root, unordered_map<int, string>& huffmanCodes, const string& code = "");
 map<int, string> generar_canonico_huffman(const map<int, string>& huffmanCodes);
-map<int, string> padding_codigos_canonicos(const unordered_map<int, string>& huffmanCodes, int fixedLength);
+unordered_map<int, string> padding_codigos(const unordered_map<int, string>& huffmanCodes, int fixedLength);
 map<int,int> frecuencias_gap_arr(int gap_arr[],int gap_lenght);
 
 #endif // FUNCIONES_H
