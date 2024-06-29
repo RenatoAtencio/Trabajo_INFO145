@@ -10,8 +10,6 @@ using namespace std;
 
 // binary_search.cpp
 int binary_Search(int arr[], int size, int key);
-void validarM(int success_binary_search, int numero_buscado);
-double tiempo_binary_search(int largo_arreglo, int* Arr, int numero_buscado);
 pair<int, int> binary_Search_Intervalos(int arr[], int largo_arr, int num);
 
 // metodos_arr.cpp
@@ -56,7 +54,6 @@ struct comparar_nodos {
 int codigo_mas_largo(const unordered_map<int, string>& huffmanCodes);
 Nodo_Huffman* crear_arbol_huffman(vector<Nodo_Huffman*>& nodos);
 void crear_codigos_huffman(Nodo_Huffman* root, unordered_map<int, string>& huffmanCodes, const string& code = "");
-map<int, string> generar_canonico_huffman(const map<int, string>& huffmanCodes);
 unordered_map<int, string> padding_codigos(const unordered_map<int, string>& huffmanCodes, int fixedLength);
 map<int,int> frecuencias_gap_arr(int gap_arr[],int gap_lenght);
 
