@@ -11,98 +11,102 @@
 
 using namespace std;
 
-void secuencia_lineal(int largo_arreglo, int m, int b, int epsilon,int Arr_lineal[],int gap_Arr_lineal[] ,int sample_ArrLineal[] , vector<double>& resultados_lineal);
-void secuencia_normal(int largo_arreglo, int m, int b, int epsilon, double mean, double stddev,int Arr_normal[], int gap_Arr_normal[],int sample_ArrNormal[], vector<double>& resultados_normal);
+void secuencia_lineal(int largo_arreglo, int m, int b, int epsilon, vector<double>& resultados_lineal);
+void secuencia_normal(int largo_arreglo, int m, int b, int epsilon, double mean, double stddev, vector<double>& resultados_normal);
 
 // Main
-int main(int argc, char **argv)
-{
-    if (argc != 2)
-    {
+int main(int argc, char **argv){
+    if (argc != 2){
         cout << "Entrada debe ser ./binaryS largo_arreglos" << endl;
         exit(1);
     }
-    srand(time(nullptr));
 
     int largo_arreglo = atoi(argv[1]);
+    if (largo_arreglo <= 0){
+        cerr << "Largo de arreglo invalido (<= 0)" << endl;
+        exit(EXIT_FAILURE);
+    }
 
+    // seed num random (Quizas pasar como parametro, como recomendo el profe Cristobal)
+    srand(time(nullptr));  
+
+    // Cargar var de entorno
     const int iteraciones = get_env_int("ITERACIONES");
     const int epsilon = get_env_int("EPSILON");    
     const double mean = get_env_double("MEAN");  
     const double stddev = get_env_double("STDDEV");
 
     int m = int(sqrt(largo_arreglo)); // Largo del array sample
-    int b = largo_arreglo / m;        // Largo de los intervalos en el sample (Tambiens se puede ver como el salto en el arreglo)
+    int b = largo_arreglo / m;        // Largo de los intervalos en el sample (Tambiens se puede interpretar como el salto en el arreglo)
 
     // Vector de los resultados(tiempos) de la busqueda
     vector<double> resultados_lineal;
     vector<double> resultados_normal;
 
+    cout << "Ejecutando" << endl;
+    for (int i = 0; i < iteraciones; i++){
+        // cout << "iteracion " << i+1 << endl; cout << endl;
+        secuencia_lineal(largo_arreglo, m, b, epsilon, resultados_lineal);
+        secuencia_normal(largo_arreglo, m, b, epsilon, mean, stddev, resultados_normal);
+    } 
+    cout << "Ejecucion Terminada" << endl;
+    
     // Crear .CSV
     string path = crear_file_name();
     crear_archivo_txt(path);
-
-    // Arreglos estaticos que usaremos
-    int Arr_lineal[largo_arreglo];
-    int gap_Arr_lineal[largo_arreglo];
-    int sample_ArrLineal[m];
-
-    // Se podrian usar los mismos arreglos de arriba pero por orden los creamos 
-    int Arr_normal[largo_arreglo];
-    int gap_Arr_normal[largo_arreglo];
-    int sample_ArrNormal[m];
-
-    for (int i = 0; i < iteraciones; i++)
-    {
-        cout << "iteracion " << i+1 << endl; cout << endl;
-        secuencia_lineal(largo_arreglo, m, b, epsilon, Arr_lineal, gap_Arr_lineal,sample_ArrLineal, resultados_lineal);
-        cout << "--------------" << endl;
-        secuencia_normal(largo_arreglo, m, b, epsilon, mean, stddev, Arr_normal, gap_Arr_normal,sample_ArrNormal, resultados_normal);
-    }
-
     escribir_resultados_csv(resultados_lineal, resultados_normal, path, largo_arreglo);
+    
     return 0;
-}
+};
 
-void secuencia_lineal(int largo_arreglo, int m, int b, int epsilon,int Arr_lineal[], int gap_Arr_lineal[] ,int sample_ArrLineal[] ,vector<double>& resultados_lineal)
-{
+void secuencia_lineal(int largo_arreglo, int m, int b, int epsilon ,vector<double>& resultados_lineal){
+    // Crear los arreglos
+    int *Arr_lineal = new int[largo_arreglo];
+    int *gap_Arr_lineal = new int[largo_arreglo];
+    int *sample_ArrLineal = new int[m];
 
     crear_ArrLineal(largo_arreglo, Arr_lineal, epsilon);
-    gap_Coding(Arr_lineal, gap_Arr_lineal, largo_arreglo);
-    sample_Array(Arr_lineal, sample_ArrLineal, m, b);
-
-    cout<<"arreglo lineal : "; print_Arr(largo_arreglo,Arr_lineal); cout<<endl;
-    cout<<"arreglo gap    : "; print_Arr(largo_arreglo,gap_Arr_lineal); cout<<endl;
-    cout<<"arreglo sample : "; print_Arr(m,sample_ArrLineal); cout<<endl;
+    gap_Coding(Arr_lineal, gap_Arr_lineal, largo_arreglo);  // Rellena el arreglo gap
+    sample_Array(Arr_lineal, sample_ArrLineal, m, b);       // Rellena el arreglo sample considerando los parametros indicados
 
     int numero_buscado = experimental::randint(int(Arr_lineal[0]), int(Arr_lineal[largo_arreglo-1]));
 
+    // Busqueda del numero (Ahora se hace la busqueda binaria en el sample, luego se suma sequencialmente en el gap)
     Time_Interval* Tiempo = new Time_Interval();
     pair<int, int> intervalo = binary_Search_Intervalos(sample_ArrLineal, m, numero_buscado);
     search_in_gap(gap_Arr_lineal, numero_buscado, sample_ArrLineal[intervalo.first], intervalo.first * b, intervalo.second * b, largo_arreglo);
     double duration = Tiempo->tiempo_transcurrido();
     resultados_lineal.push_back(duration);
 
+    // Liberar espacio
     delete Tiempo;
-}
+    delete[] Arr_lineal;
+    delete[] gap_Arr_lineal;
+    delete[] sample_ArrLineal;
+};
 
-void secuencia_normal(int largo_arreglo, int m, int b, int epsilon, double mean, double stddev,int Arr_normal[],int gap_Arr_normal[],int sample_ArrNormal[], vector<double>& resultados_normal)
-{
+void secuencia_normal(int largo_arreglo, int m, int b, int epsilon, double mean, double stddev,  vector<double>& resultados_normal){
+    // Crear los arreglos
+    int *Arr_normal = new int[largo_arreglo];
+    int *gap_Arr_normal = new int[largo_arreglo];
+    int *sample_ArrNormal = new int[m];
+
     crear_ArrNormal(largo_arreglo, Arr_normal, mean, stddev);
     gap_Coding(Arr_normal, gap_Arr_normal, largo_arreglo);
     sample_Array(Arr_normal, sample_ArrNormal, m, b);
 
-    cout<<"arreglo Normal : "; print_Arr(largo_arreglo,Arr_normal); cout<<endl;
-    cout<<"arreglo gap    : "; print_Arr(largo_arreglo,gap_Arr_normal); cout<<endl;
-    cout<<"arreglo sample : "; print_Arr(m,sample_ArrNormal); cout<<endl;
-
     int numero_buscado = experimental::randint(int(Arr_normal[0]), int(Arr_normal[largo_arreglo-1]));
 
+    // Busqueda del numero (Ahora se hace la busqueda binaria en el sample, luego se suma sequencialmente en el gap)
     Time_Interval* Tiempo = new Time_Interval();
     pair<int, int> intervalo = binary_Search_Intervalos(sample_ArrNormal, m, numero_buscado);
     search_in_gap(gap_Arr_normal, numero_buscado, sample_ArrNormal[intervalo.first], intervalo.first * b, intervalo.second * b, largo_arreglo);
     double duration = Tiempo->tiempo_transcurrido();
     resultados_normal.push_back(duration);
 
+    // Liberar espacio
     delete Tiempo;
-}
+    delete[] Arr_normal;
+    delete[] gap_Arr_normal;
+    delete[] sample_ArrNormal;
+};

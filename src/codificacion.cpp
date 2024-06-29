@@ -95,8 +95,8 @@ unordered_map<int, string> padding_codigos(const unordered_map<int, string>& huf
     
     for (const auto& pair : huffmanCodes) {
         string paddedCode = pair.second;
-        while (paddedCode.length() < fixedLength) {
-            paddedCode += "0"; // Agregar ceros a la derecha
+        if (paddedCode.length() < fixedLength) {
+            paddedCode += string(fixedLength-paddedCode.length(),'0'); 
         }
         canonicalCodes[pair.first] = paddedCode;
     }
