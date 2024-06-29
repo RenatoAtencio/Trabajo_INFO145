@@ -1,11 +1,24 @@
 # Trabajo_INFO145
 Trabajo de diseño y análisis de algoritmos
 
+VARIABLES DE ENTORNO(config/.env):
+    EPSILON=10
+    MEAN=25
+    STDDEV=5
+    ITERACIONES=100
+
+COMPILACION
+    1) Ejecutar en consola:
+        make
+
 EJECUCION:
     1) Crear carpeta out. (Estar en el directorio Trabajo_INFO145) 
+        Trabajo_Info145
+           |out 
+           |src
     2) Ejecutar en consola
-        2.1) set -o allexport
-        2.2) source config/.env
+        2.1) set -o allexport       | Permite cargar las variables de entorno
+        2.2) source config/.env     | Volver a usar si se actualiza el .env
     3) Ejecutar el prog a eleccion
         3.1) ./normal n
         3.2) ./gap n

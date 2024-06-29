@@ -47,14 +47,15 @@ int main(int argc, char **argv)
     string path = crear_file_name();
     crear_archivo_txt(path);
 
-    cout << "Ejecutando" << endl;
 
+    cout << "Ejecutando" << endl;
     for (int i = 0; i < iteraciones; i++)
     {
-        cout << "Iteracion: " << i+1 << endl;
+        // cout << "Iteracion: " << i+1 << endl;
         secuencia_lineal(largo_arreglo, m, b, epsilon, resultados_lineal);
         secuencia_normal(largo_arreglo, m, b, epsilon, mean, stddev, resultados_normal);
     }
+    cout << "Ejecucion Terminada" << endl;
 
     escribir_resultados_csv(resultados_lineal, resultados_normal, path, largo_arreglo);
     return 0;
