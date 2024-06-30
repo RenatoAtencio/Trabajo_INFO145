@@ -11,20 +11,18 @@
 using namespace std;
 
 // Crea el path+file_name para los archivos de salida
-string crear_file_name(){
+string crear_file_name(string folder,string titulo){
     const char* user_env = getenv("USER");
     if (!user_env) {
         user_env = "user";
     }
-
-    string titulo = "Tests";
 
     auto now = chrono::system_clock::now();
     auto in_time_t = chrono::system_clock::to_time_t(now);
     stringstream ss;
     ss << put_time(localtime(&in_time_t), "%Y-%m-%d %Hh-%Mm-%Ss");
 
-    string path = "out/" + titulo + " - " + string(user_env) + " - " + ss.str() + ".csv";
+    string path = "out/" + folder + "/" + titulo + " - " + string(user_env) + " - " + ss.str() + ".csv";
     return path;
 };
 

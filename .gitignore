@@ -1,1 +1,3 @@
-out/**
+out/gap/**
+out/normal/** 
+out/huffman/**

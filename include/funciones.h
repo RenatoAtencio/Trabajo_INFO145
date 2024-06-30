@@ -25,7 +25,7 @@ int search_in_gap_codificado(unordered_map<int, string> canonicalCodes,char *arr
 void crear_archivo_txt(const string& path);
 void escribir_resultados(const vector<double>& resultados, const string& path, int largo_arreglo, int numero_buscado, const string& tipo_arr);
 void escribir_resultados_csv(const vector<double>& resultados_lineal,const vector<double>& resultados_normal, const string& path, int largo_arreglo);
-string crear_file_name();
+string crear_file_name(string folder, string titulo);
 
 // metodos_var_entorno.cpp
 int get_env_int(const char* var_name);

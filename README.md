@@ -12,9 +12,12 @@ COMPILACION
         make
 
 EJECUCION:
-    1) Crear carpeta out. (Estar en el directorio Trabajo_INFO145) 
+    1) Crear carpetas out. (Estar en el directorio Trabajo_INFO145) 
         Trabajo_Info145
            |out 
+               |normal
+               |huffman
+               |gap
            |src
     2) Ejecutar en consola
         2.1) set -o allexport       | Permite cargar las variables de entorno

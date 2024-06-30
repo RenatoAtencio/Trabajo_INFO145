@@ -15,8 +15,8 @@
 
 using namespace std;
 
-void secuencia_lineal(int largo_arreglo, int m, int b, int epsilon,vector<double>& resultados_lineal);
-void secuencia_normal(int largo_arreglo, int m, int b, int epsilon, double mean, double stddev, vector<double>& resultados_normal);
+void secuencia_lineal(int largo_arreglo, int m, int b, int epsilon,vector<double>& resultados_lineal,vector<double>& resultados_prebusqueda_lienal);
+void secuencia_normal(int largo_arreglo, int m, int b, int epsilon, double mean, double stddev, vector<double>& resultados_normal,vector<double>& resultados_prebusqueda_normal);
 map<int,int> frecuencias_gap_arr(int gap_arr[],int gap_lenght);
 
 // Main
@@ -43,25 +43,34 @@ int main(int argc, char **argv)
     vector<double> resultados_lineal;
     vector<double> resultados_normal;
 
-    // Crear .CSV
-    string path = crear_file_name();
-    crear_archivo_txt(path);
+    vector<double> resultados_prebusqueda_lineal;   
+    vector<double> resultados_prebusqueda_normal;  
+
+    
 
 
     cout << "Ejecutando" << endl;
     for (int i = 0; i < iteraciones; i++)
     {
         // cout << "Iteracion: " << i+1 << endl;
-        secuencia_lineal(largo_arreglo, m, b, epsilon, resultados_lineal);
-        secuencia_normal(largo_arreglo, m, b, epsilon, mean, stddev, resultados_normal);
+        secuencia_lineal(largo_arreglo, m, b, epsilon, resultados_lineal,resultados_prebusqueda_lineal);
+        secuencia_normal(largo_arreglo, m, b, epsilon, mean, stddev, resultados_normal,resultados_prebusqueda_normal);
     }
     cout << "Ejecucion Terminada" << endl;
 
-    escribir_resultados_csv(resultados_lineal, resultados_normal, path, largo_arreglo);
+    // Path archivo .CSV de los resultados
+    string path_tiempo_busqueda = crear_file_name("huffman","busqueda");
+    crear_archivo_txt(path_tiempo_busqueda);
+    escribir_resultados_csv(resultados_lineal,resultados_normal, path_tiempo_busqueda, largo_arreglo);
+
+    string path_tiempo_prebusqueda = crear_file_name("huffman","prebusqueda");
+    crear_archivo_txt(path_tiempo_prebusqueda);
+    escribir_resultados_csv(resultados_prebusqueda_lineal,resultados_prebusqueda_normal, path_tiempo_prebusqueda, largo_arreglo);
+
     return 0;
 }
 
-void secuencia_lineal(int largo_arreglo, int m, int b, int epsilon,vector<double>& resultados_lineal)
+void secuencia_lineal(int largo_arreglo, int m, int b, int epsilon,vector<double>& resultados_lineal,vector<double>& resultados_prebusqueda_lineal)
 {
     int *Arr_lineal = new int[largo_arreglo];
     int *Arr_gap_lineal = new int[largo_arreglo];
@@ -80,6 +89,8 @@ void secuencia_lineal(int largo_arreglo, int m, int b, int epsilon,vector<double
     // int numero_buscado = Arr_lineal[largo_arreglo-1];
     int numero_buscado = experimental::randint(int(Arr_lineal[0]), int(Arr_lineal[largo_arreglo-1]));
     
+
+    Time_Interval* Tiempo_prebusqueda = new Time_Interval();
 
     // Calculamos las frecuencias de los numeros para crear el arbol de huffman
     map<int,int> frecuencias = frecuencias_gap_arr(Arr_gap_lineal,largo_arreglo);
@@ -124,6 +135,10 @@ void secuencia_lineal(int largo_arreglo, int m, int b, int epsilon,vector<double
         arr_gap_comprimido[i] = codigo_comprimido;
     }
 
+    double duration = Tiempo_prebusqueda->tiempo_transcurrido();
+    resultados_prebusqueda_lineal.push_back(duration);
+    delete Tiempo_prebusqueda;
+
     // Prints de espacio principal usado
     // cout << "Size arr: " << sizeof(Arr_lineal[0]) * largo_arreglo << endl;
     // cout << "Size arr gap: " << sizeof(Arr_gap_lineal[0]) * largo_arreglo << endl;
@@ -137,7 +152,7 @@ void secuencia_lineal(int largo_arreglo, int m, int b, int epsilon,vector<double
     // Suma secuencial en el gap 
     search_in_gap_codificado(padded_huffman,arr_gap_comprimido, numero_buscado, Arr_sample_lineal[intervalo.first], intervalo.first * b, intervalo.second * b, largo_arreglo);
     
-    double duration = Tiempo->tiempo_transcurrido();
+    duration = Tiempo->tiempo_transcurrido();
     resultados_lineal.push_back(duration);
     
     // Liberar memoria 
@@ -148,7 +163,7 @@ void secuencia_lineal(int largo_arreglo, int m, int b, int epsilon,vector<double
     delete[] Arr_sample_lineal;
 }
 
-void secuencia_normal(int largo_arreglo, int m, int b, int epsilon, double mean, double stddev, vector<double>& resultados_normal)
+void secuencia_normal(int largo_arreglo, int m, int b, int epsilon, double mean, double stddev, vector<double>& resultados_normal,vector<double>& resultados_prebusqueda_normal)
 {
 
     int *Arr_normal = new int[largo_arreglo];
@@ -160,6 +175,8 @@ void secuencia_normal(int largo_arreglo, int m, int b, int epsilon, double mean,
     sample_Array(Arr_normal, sample_ArrNormal, m, b);
 
     int numero_buscado = experimental::randint(int(Arr_normal[0]), int(Arr_normal[largo_arreglo-1]));
+
+    Time_Interval* Tiempo_prebusqueda = new Time_Interval();
 
     // Calculamos las frecuencias de los numeros para crear el arbol de huffman
     map<int,int> frecuencias = frecuencias_gap_arr(gap_Arr_normal,largo_arreglo);
@@ -204,6 +221,10 @@ void secuencia_normal(int largo_arreglo, int m, int b, int epsilon, double mean,
         arr_gap_comprimido[i] = codigo_comprimido;
     }
 
+    double duration = Tiempo_prebusqueda->tiempo_transcurrido();
+    resultados_prebusqueda_normal.push_back(duration);
+    delete Tiempo_prebusqueda;
+
     // Prints de espacio principal usado
     // cout << "NORMAL Size arr: " << sizeof(Arr_normal[0]) * largo_arreglo << endl;
     // cout << "NORMAL Size arr gap: " << sizeof(gap_Arr_normal[0]) * largo_arreglo << endl;
@@ -214,7 +235,7 @@ void secuencia_normal(int largo_arreglo, int m, int b, int epsilon, double mean,
     pair<int, int> intervalo = binary_Search_Intervalos(sample_ArrNormal, m, numero_buscado);
     search_in_gap_codificado(padded_huffman,arr_gap_comprimido, numero_buscado, sample_ArrNormal[intervalo.first], intervalo.first * b, intervalo.second * b, largo_arreglo);
     
-    double duration = Tiempo->tiempo_transcurrido();
+    duration = Tiempo->tiempo_transcurrido();
     resultados_normal.push_back(duration);
 
     delete Tiempo;

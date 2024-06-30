@@ -7,8 +7,8 @@
 
 using namespace std;
 
-void secuencia_lineal(int largo_arreglo, int epsilon, vector<double>& resultados_lineal);
-void secuencia_normal(int largo_arreglo, double mean, double stddev, vector<double>& resultados_normal);
+void secuencia_lineal(int largo_arreglo, int epsilon, vector<double>& resultados_lineal, vector<double>& tiempo_arr_lineal);
+void secuencia_normal(int largo_arreglo, double mean, double stddev, vector<double>& resultados_normal, vector<double>& tiempo_arr_normal);
 
 // Main
 int main(int argc, char** argv) {
@@ -37,30 +37,41 @@ int main(int argc, char** argv) {
     vector<double> resultados_lineal;   
     vector<double> resultados_normal;   
 
+    vector<double> tiempo_arr_lineal;   
+    vector<double> tiempo_arr_normal;   
+
     // Loop de la ejecucion principal
     cout << "Ejecutando" << endl;
     for (int i = 0; i < iteraciones; i++) {
         // cout << "Iteracion: " << i+1 << endl;
-        secuencia_lineal(largo_arreglo, epsilon, resultados_lineal);
-        secuencia_normal(largo_arreglo, mean, stddev, resultados_normal);
+        secuencia_lineal(largo_arreglo, epsilon, resultados_lineal,tiempo_arr_lineal);
+        secuencia_normal(largo_arreglo, mean, stddev, resultados_normal,tiempo_arr_normal);
     }
     cout << "Ejecucion Terminada" << endl;
 
     // Path archivo .CSV de los resultados
-    string path = crear_file_name();
-    crear_archivo_txt(path);
-    // Pasar resultados al excel
-    escribir_resultados_csv(resultados_lineal,resultados_normal, path, largo_arreglo);
+    string path_tiempo_busqueda = crear_file_name("normal","busqueda");
+    crear_archivo_txt(path_tiempo_busqueda);
+    escribir_resultados_csv(resultados_lineal,resultados_normal, path_tiempo_busqueda, largo_arreglo);
+
+    string path_tiempo_creacion = crear_file_name("normal","creacion");
+    crear_archivo_txt(path_tiempo_creacion);
+    escribir_resultados_csv(tiempo_arr_lineal,tiempo_arr_normal, path_tiempo_creacion, largo_arreglo);
 
     return 0;
 };
 
 
 // Tiempo de la busqueda binaria con el arreglo lineal
-void secuencia_lineal(int largo_arreglo, int epsilon, vector<double>& resultados_lineal){
+void secuencia_lineal(int largo_arreglo, int epsilon, vector<double>& resultados_lineal, vector<double>& tiempo_arr_lineal){
 
     // Crear nuevo Arreglo
+    Time_Interval* Tiempo_creacion = new Time_Interval();
     int *Arr_lineal = new int[largo_arreglo]; 
+    double duration = Tiempo_creacion->tiempo_transcurrido();
+    tiempo_arr_lineal.push_back(duration);
+
+    delete Tiempo_creacion;
 
     // Rellenar con randoms
     crear_ArrLineal(largo_arreglo, Arr_lineal, epsilon);
@@ -71,7 +82,7 @@ void secuencia_lineal(int largo_arreglo, int epsilon, vector<double>& resultados
     // Busqueda
     Time_Interval* Tiempo = new Time_Interval();
     binary_Search(Arr_lineal, largo_arreglo, numero_buscado);
-    double duration = Tiempo->tiempo_transcurrido();
+    duration = Tiempo->tiempo_transcurrido();
     resultados_lineal.push_back(duration);
 
     // Liberar espacio
@@ -81,10 +92,15 @@ void secuencia_lineal(int largo_arreglo, int epsilon, vector<double>& resultados
 
 
 // Tiempo de la busqueda binaria con el arreglo normal
-void secuencia_normal(int largo_arreglo, double mean, double stddev, vector<double>& resultados_normal){
+void secuencia_normal(int largo_arreglo, double mean, double stddev, vector<double>& resultados_normal, vector<double>& tiempo_arr_normal){
 
     // Crear nuevo Arreglo
+    Time_Interval* Tiempo_creacion = new Time_Interval();
     int *Arr_normal = new int[largo_arreglo];
+    double duration = Tiempo_creacion->tiempo_transcurrido();
+    tiempo_arr_normal.push_back(duration);
+
+    delete Tiempo_creacion;
 
     // Rellenar con randoms
     crear_ArrNormal(largo_arreglo, Arr_normal, mean, stddev);
@@ -95,7 +111,7 @@ void secuencia_normal(int largo_arreglo, double mean, double stddev, vector<doub
     // Busqueda binaria
     Time_Interval* Tiempo = new Time_Interval();
     binary_Search(Arr_normal, largo_arreglo, numero_buscado);
-    double duration = Tiempo->tiempo_transcurrido();
+    duration = Tiempo->tiempo_transcurrido();
     resultados_normal.push_back(duration);
 
     // Liberar espacio
