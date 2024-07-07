@@ -9,237 +9,178 @@
 #include <queue>
 #include <algorithm>
 #include <bitset>
+#include <unistd.h> 
 
 #include "../include/funciones.h"
 #include "../include/Time_Interval.h"
 
 using namespace std;
 
-void secuencia_lineal(int largo_arreglo, int m, int b, int epsilon,vector<double>& resultados_lineal,vector<double>& resultados_prebusqueda_lienal);
-void secuencia_normal(int largo_arreglo, int m, int b, int epsilon, double mean, double stddev, vector<double>& resultados_normal,vector<double>& resultados_prebusqueda_normal);
-map<int,int> frecuencias_gap_arr(int gap_arr[],int gap_lenght);
+// Estructura de los vectores resultado
+struct Vectores_de_resultados {
+    vector<double> tiempo_frecuencias;
+    vector<double> tiempo_huffman;
+    vector<double> tiempo_busqueda_gap_codificado;
+};
+
+// Estructura de los datos para la creacion de los arreglos
+struct Datos {
+    const int epsilon;
+    const double mean;
+    const double stddev;
+    int m;
+    int b;
+
+    // Constructor para inicializar los datos
+    Datos(int largo_arreglo)
+        : epsilon(get_env_int("EPSILON")),      // Carga var de entorno
+          mean(get_env_double("MEAN")),
+          stddev(get_env_double("STDDEV")),
+          m(int(sqrt(largo_arreglo))),          // Define m 
+          b(largo_arreglo / m) {}               // Define b
+};
+
+// Declaracion de funciones
+void secuencia(char modo, int largo_arreglo, Vectores_de_resultados &resultados, Datos configuracion);
 
 // Main
-int main(int argc, char **argv)
-{
-    if (argc != 2)
-    {
+int main(int argc, char **argv){
+    if (argc != 2){
         cout << "Entrada debe ser ./binaryS largo_arreglos" << endl;
         exit(1);
     }
+
     srand(time(nullptr));
 
     int largo_arreglo = atoi(argv[1]);
 
+    Datos configuracion = Datos(largo_arreglo);   // Estructura con los datos para la creacion de los arreglos (Es mas ordenado que pasar todos lo datos por separado)
+
+    // Cargar var de entorno
     const int iteraciones = get_env_int("ITERACIONES");
-    const int epsilon = get_env_int("EPSILON");    
-    const double mean = get_env_double("MEAN");  
-    const double stddev = get_env_double("STDDEV");
 
-    int m = int(sqrt(largo_arreglo)); // Largo del array sample
-    int b = largo_arreglo / m;        // Largo de los intervalos en el sample (Tambiens se puede ver como el salto en el arreglo)
+    // Vectores de resultados
+    Vectores_de_resultados resultados_arreglo_lineal;
+    Vectores_de_resultados resultados_arreglo_normal;
 
-    // Vector de los resultados(tiempos) de la busqueda
-    vector<double> resultados_lineal;
-    vector<double> resultados_normal;
-
-    vector<double> resultados_prebusqueda_lineal;   
-    vector<double> resultados_prebusqueda_normal;  
-
-    
-
+    cout << "PID del programa: " << getpid() << endl;
 
     cout << "Ejecutando" << endl;
-    for (int i = 0; i < iteraciones; i++)
-    {
-        // cout << "Iteracion: " << i+1 << endl;
-        secuencia_lineal(largo_arreglo, m, b, epsilon, resultados_lineal,resultados_prebusqueda_lineal);
-        secuencia_normal(largo_arreglo, m, b, epsilon, mean, stddev, resultados_normal,resultados_prebusqueda_normal);
-    }
+    for (int i = 0; i < iteraciones; i++){
+        secuencia('l', largo_arreglo, resultados_arreglo_lineal, configuracion);
+        secuencia('n', largo_arreglo, resultados_arreglo_normal, configuracion);
+    } 
     cout << "Ejecucion Terminada" << endl;
 
     // Path archivo .CSV de los resultados
-    string path_tiempo_busqueda = crear_file_name("huffman","busqueda");
+    string path_tiempo_busqueda = crear_file_name("huffman","busqueda_gap_codificado");
     crear_archivo_txt(path_tiempo_busqueda);
-    escribir_resultados_csv(resultados_lineal,resultados_normal, path_tiempo_busqueda, largo_arreglo);
+    escribir_resultados_csv(resultados_arreglo_lineal.tiempo_busqueda_gap_codificado,resultados_arreglo_normal.tiempo_busqueda_gap_codificado, path_tiempo_busqueda, largo_arreglo);
 
-    string path_tiempo_prebusqueda = crear_file_name("huffman","prebusqueda");
-    crear_archivo_txt(path_tiempo_prebusqueda);
-    escribir_resultados_csv(resultados_prebusqueda_lineal,resultados_prebusqueda_normal, path_tiempo_prebusqueda, largo_arreglo);
+    string path_frec = crear_file_name("huffman","calculo_frecuencias");
+    crear_archivo_txt(path_frec);
+    escribir_resultados_csv(resultados_arreglo_lineal.tiempo_frecuencias,resultados_arreglo_normal.tiempo_frecuencias, path_frec, largo_arreglo);
+
+    string path_huffman = crear_file_name("huffman","creacion_huffman_codes");
+    crear_archivo_txt(path_huffman);
+    escribir_resultados_csv(resultados_arreglo_lineal.tiempo_huffman,resultados_arreglo_normal.tiempo_huffman, path_huffman, largo_arreglo);
 
     return 0;
-}
+};
 
-void secuencia_lineal(int largo_arreglo, int m, int b, int epsilon,vector<double>& resultados_lineal,vector<double>& resultados_prebusqueda_lineal)
-{
-    int *Arr_lineal = new int[largo_arreglo];
-    int *Arr_gap_lineal = new int[largo_arreglo];
-    int *Arr_sample_lineal = new int[m];
+// Secuencia principal, Como se aplican los mismo procesos a los arreglos lineal y normal solo estos serian lo que cambia en cada experimento
+void secuencia(char modo, int largo_arreglo, Vectores_de_resultados &resultados, Datos configuracion){
+    int m = configuracion.m;
+    int b = configuracion.b;
 
+    // Declarar los arreglo
+    int *arreglo = new int[largo_arreglo];      // Arreglo original
+    int *arreglo_gap = new int[largo_arreglo];  // Arreglo gap
+    int *arreglo_sample = new int[m];           // Arreglo sample
 
-    // Llenar los arreglos 
-    // Arr_lineal
-    crear_ArrLineal(largo_arreglo, Arr_lineal, epsilon);
-    // Arr_gap
-    gap_Coding(Arr_lineal, Arr_gap_lineal, largo_arreglo);
-    // Arr_sample
-    sample_Array(Arr_lineal, Arr_sample_lineal, m, b);
+    // Crear los arreglos dependiendo del modo (l: lineal, n: normal)
+    switch (modo){
+        case ('l'):
+            crear_ArrLineal(largo_arreglo, arreglo, configuracion.epsilon);     // Crea el arreglo lineal
+            break;  
+        case ('n'):
+            crear_ArrNormal(largo_arreglo, arreglo, configuracion.mean, configuracion.stddev);  // Crea el arreglo normal
+            break;
+        default:
+            cerr << "Modo seleccionado invalido" << endl;
+            exit(EXIT_FAILURE);
+            break;
+    }
 
-    // Generamos un numero random entre los limites del arreglo
-    // int numero_buscado = Arr_lineal[largo_arreglo-1];
-    int numero_buscado = experimental::randint(int(Arr_lineal[0]), int(Arr_lineal[largo_arreglo-1]));
-    
+    // Define un num_random a buscar entre el rango del arreglo
+    int num_buscado = experimental::randint(int(arreglo[0]), int(arreglo[largo_arreglo-1]));    
 
-    Time_Interval* Tiempo_prebusqueda = new Time_Interval();
+    // Creacion de los arreglos Gap y Sample
+    gap_Coding(arreglo, arreglo_gap, largo_arreglo);                    
+    sample_Array(arreglo, arreglo_sample, m, b);
 
-    // Calculamos las frecuencias de los numeros para crear el arbol de huffman
-    map<int,int> frecuencias = frecuencias_gap_arr(Arr_gap_lineal,largo_arreglo);
+    delete[] arreglo;   // Borramos el arreglo original ya que no lo volveremos a usar
 
-    
+    // ###### Creacion Codigos ######
+    // Calculamos la frecuencia de los numeros en el Gap
+    Time_Interval* tiempo_frecuencias = new Time_Interval(); 
+    unordered_map<int,int> frecuencias = frecuencias_gap_arr(arreglo_gap,largo_arreglo);
+    double duracion_frec = tiempo_frecuencias->tiempo_transcurrido();
+    resultados.tiempo_frecuencias.push_back(duracion_frec);
+
     // Crar vector de nodos para la creacion del arbol de huffman
     vector<Nodo_Huffman*> nodos;
     for (const auto& pair : frecuencias) {
         nodos.push_back(new Nodo_Huffman(pair.first, pair.second));
     }
     
-    
+    Time_Interval* tiempo_huffman = new Time_Interval();
     // Crear el arbol de huffman, devuelve el root
     Nodo_Huffman* root = crear_arbol_huffman(nodos);  
     
     // Generar codigos de Huffman, huffmanCodes es pasado como referencia. (Se llena al llamar a la funcion)
     unordered_map<int, string> huffmanCodes;
     crear_codigos_huffman(root, huffmanCodes);  
-
     
-    int largo_max = codigo_mas_largo(huffmanCodes); // Obtenemos el codigo de Huffman mas largo (Lo usaremos para ver si usamos 8bits o 16bits)
+    // int largo_max = codigo_mas_largo(huffmanCodes); // Obtenemos el codigo de Huffman mas largo (Lo usaremos para ver si usamos 8bits o 16bits)
 
-    if (largo_max > 8){
-        largo_max = 16;
-    }
-    largo_max = 8;
-    char *arr_gap_comprimido = new char[largo_arreglo]; 
-
+    int largo_max = 8;
+    char *arreglo_gap_comprimido = new char[largo_arreglo]; 
+    
     // Crea un mapa con los codigos + padding, el padding son 0 a la derecha hasta completar el largo necesario
     unordered_map<int, string> padded_huffman;
     padded_huffman = padding_codigos(huffmanCodes,largo_max);
+    double duracion_huffman = tiempo_huffman->tiempo_transcurrido();
+    resultados.tiempo_huffman.push_back(duracion_huffman);
 
-    
     // Rellenar arreglo gap comprimido
     for (int i = 0; i<largo_arreglo;i++){
-        bitset<32> codigo{padded_huffman[Arr_gap_lineal[i]]};
+        bitset<32> codigo{padded_huffman[arreglo_gap[i]]};
         string binaryCode = codigo.to_string().substr(32 - largo_max);
         if (largo_max > 8){
             short int codigo_comprimido = static_cast<short int>(codigo.to_ulong());
         }
         char codigo_comprimido = static_cast<char>(codigo.to_ulong());
-        arr_gap_comprimido[i] = codigo_comprimido;
+        arreglo_gap_comprimido[i] = codigo_comprimido;
     }
 
-    double duration = Tiempo_prebusqueda->tiempo_transcurrido();
-    resultados_prebusqueda_lineal.push_back(duration);
-    delete Tiempo_prebusqueda;
+    delete[] arreglo_gap;   // Ahora se puede borrar el gap
 
-    // Prints de espacio principal usado
-    // cout << "Size arr: " << sizeof(Arr_lineal[0]) * largo_arreglo << endl;
-    // cout << "Size arr gap: " << sizeof(Arr_gap_lineal[0]) * largo_arreglo << endl;
-    // cout << "Size arr sample: " << sizeof(Arr_sample_lineal[0]) * m << endl;
-    // cout << "Size arr comprimido: " << sizeof(arr_gap_comprimido[0]) * largo_arreglo << endl;
+    // ###### Busqueda en Sample ######
+    // Busqueda binaria sobre el Sample
+    pair<int, int> intervalo = binary_Search_Intervalos(arreglo_sample, m, num_buscado);
 
-    Time_Interval* Tiempo = new Time_Interval();
+    // ###### Busqueda en Gap codificado ######
+    Time_Interval* tiempo_busqueda_gap_cod = new Time_Interval();
+    // Busqueda secuencial en el Gap
+    search_in_gap_codificado(padded_huffman,arreglo_gap_comprimido, num_buscado, arreglo_sample[intervalo.first], intervalo.first * b, intervalo.second * b, largo_arreglo);
+    double tiempo_busqueda = tiempo_busqueda_gap_cod->tiempo_transcurrido();
+    resultados.tiempo_busqueda_gap_codificado.push_back(tiempo_busqueda);
 
-    // Busqueda binaria sobre el sample
-    pair<int, int> intervalo = binary_Search_Intervalos(Arr_sample_lineal, m, numero_buscado);
-    // Suma secuencial en el gap 
-    search_in_gap_codificado(padded_huffman,arr_gap_comprimido, numero_buscado, Arr_sample_lineal[intervalo.first], intervalo.first * b, intervalo.second * b, largo_arreglo);
-    
-    duration = Tiempo->tiempo_transcurrido();
-    resultados_lineal.push_back(duration);
-    
-    // Liberar memoria 
-    delete Tiempo; 
-    delete[] arr_gap_comprimido;
-    delete[] Arr_lineal;
-    delete[] Arr_gap_lineal;
-    delete[] Arr_sample_lineal;
-}
+    delete tiempo_busqueda_gap_cod;
+    delete tiempo_frecuencias;
+    delete tiempo_huffman;
 
-void secuencia_normal(int largo_arreglo, int m, int b, int epsilon, double mean, double stddev, vector<double>& resultados_normal,vector<double>& resultados_prebusqueda_normal)
-{
-
-    int *Arr_normal = new int[largo_arreglo];
-    int *gap_Arr_normal = new int[largo_arreglo];
-    int *sample_ArrNormal = new int[m];
-
-    crear_ArrNormal(largo_arreglo, Arr_normal, mean, stddev);
-    gap_Coding(Arr_normal, gap_Arr_normal, largo_arreglo);
-    sample_Array(Arr_normal, sample_ArrNormal, m, b);
-
-    int numero_buscado = experimental::randint(int(Arr_normal[0]), int(Arr_normal[largo_arreglo-1]));
-
-    Time_Interval* Tiempo_prebusqueda = new Time_Interval();
-
-    // Calculamos las frecuencias de los numeros para crear el arbol de huffman
-    map<int,int> frecuencias = frecuencias_gap_arr(gap_Arr_normal,largo_arreglo);
-
-    
-    // Crar vector de nodos para la creacion del arbol de huffman
-    vector<Nodo_Huffman*> nodos;
-    for (const auto& pair : frecuencias) {
-        nodos.push_back(new Nodo_Huffman(pair.first, pair.second));
-    }
-    
-    
-    // Crear el arbol de huffman, devuelve el root
-    Nodo_Huffman* root = crear_arbol_huffman(nodos);  
-    
-    // Generar codigos de Huffman, huffmanCodes es pasado como referencia. (Se llena al llamar a la funcion)
-    unordered_map<int, string> huffmanCodes;
-    crear_codigos_huffman(root, huffmanCodes);  
-
-    
-    int largo_max = codigo_mas_largo(huffmanCodes); // Obtenemos el codigo de Huffman mas largo (Lo usaremos para ver si usamos 8bits o 16bits)
-
-    if (largo_max > 8){
-        largo_max = 16;
-    }
-    largo_max = 8;
-    char *arr_gap_comprimido = new char[largo_arreglo]; 
-
-    // Crea un mapa con los codigos + padding, el padding son 0 a la derecha hasta completar el largo necesario
-    unordered_map<int, string> padded_huffman;
-    padded_huffman = padding_codigos(huffmanCodes,largo_max);
-
-    
-    // Rellenar arreglo gap comprimido
-    for (int i = 0; i<largo_arreglo;i++){
-        bitset<32> codigo{padded_huffman[gap_Arr_normal[i]]};
-        string binaryCode = codigo.to_string().substr(32 - largo_max);
-        if (largo_max > 8){
-            short int codigo_comprimido = static_cast<short int>(codigo.to_ulong());
-        }
-        char codigo_comprimido = static_cast<char>(codigo.to_ulong());
-        arr_gap_comprimido[i] = codigo_comprimido;
-    }
-
-    double duration = Tiempo_prebusqueda->tiempo_transcurrido();
-    resultados_prebusqueda_normal.push_back(duration);
-    delete Tiempo_prebusqueda;
-
-    // Prints de espacio principal usado
-    // cout << "NORMAL Size arr: " << sizeof(Arr_normal[0]) * largo_arreglo << endl;
-    // cout << "NORMAL Size arr gap: " << sizeof(gap_Arr_normal[0]) * largo_arreglo << endl;
-    // cout << "NORMAL Size arr sample: " << sizeof(sample_ArrNormal[0]) * m << endl;
-    // cout << "NORMAL Size arr comprimido: " << sizeof(arr_gap_comprimido[0]) * largo_arreglo << endl;
-
-    Time_Interval* Tiempo = new Time_Interval();
-    pair<int, int> intervalo = binary_Search_Intervalos(sample_ArrNormal, m, numero_buscado);
-    search_in_gap_codificado(padded_huffman,arr_gap_comprimido, numero_buscado, sample_ArrNormal[intervalo.first], intervalo.first * b, intervalo.second * b, largo_arreglo);
-    
-    duration = Tiempo->tiempo_transcurrido();
-    resultados_normal.push_back(duration);
-
-    delete Tiempo;
-    delete[] Arr_normal;
-    delete[] gap_Arr_normal;
-    delete[] sample_ArrNormal;
-}
+    delete[] arreglo_gap_comprimido;
+    delete[] arreglo_sample;
+};

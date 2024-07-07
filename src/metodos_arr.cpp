@@ -36,7 +36,6 @@ void gap_Coding(int *Arr, int *gapArr, int largo_arreglo){
     for(int i = 1; i < largo_arreglo; i++){
         gapArr[i] = Arr[i] - Arr[i-1];
     }
-
 }
 
 // Imprime un Arr de enteros

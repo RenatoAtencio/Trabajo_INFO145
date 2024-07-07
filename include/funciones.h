@@ -55,6 +55,6 @@ int codigo_mas_largo(const unordered_map<int, string>& huffmanCodes);
 Nodo_Huffman* crear_arbol_huffman(vector<Nodo_Huffman*>& nodos);
 void crear_codigos_huffman(Nodo_Huffman* root, unordered_map<int, string>& huffmanCodes, const string& code = "");
 unordered_map<int, string> padding_codigos(const unordered_map<int, string>& huffmanCodes, int fixedLength);
-map<int,int> frecuencias_gap_arr(int gap_arr[],int gap_lenght);
+unordered_map<int,int> frecuencias_gap_arr(int gap_arr[],int gap_lenght);
 
 #endif // FUNCIONES_H

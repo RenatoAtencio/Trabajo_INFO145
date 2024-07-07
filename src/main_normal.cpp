@@ -4,11 +4,35 @@
 #include <string>
 #include "../include/funciones.h"
 #include "../include/Time_Interval.h"
+#include <unistd.h> 
 
 using namespace std;
 
-void secuencia_lineal(int largo_arreglo, int epsilon, vector<double>& resultados_lineal, vector<double>& tiempo_arr_lineal);
-void secuencia_normal(int largo_arreglo, double mean, double stddev, vector<double>& resultados_normal, vector<double>& tiempo_arr_normal);
+// Estructura de los vectores resultado
+struct Vectores_de_resultados {
+    vector<double> tiempo_busqueda_binaria;
+    vector<double> tiempo_creacion_arreglos;
+};
+
+// Estructura de los datos para la creacion de los arreglos
+struct Datos {
+    const int epsilon;
+    const double mean;
+    const double stddev;
+    int m;
+    int b;
+
+    // Constructor para inicializar los datos
+    Datos(int largo_arreglo)
+        : epsilon(get_env_int("EPSILON")),      // Carga var de entorno
+          mean(get_env_double("MEAN")),
+          stddev(get_env_double("STDDEV")),
+          m(int(sqrt(largo_arreglo))),          // Define m 
+          b(largo_arreglo / m) {}               // Define b
+};
+
+// Declaracion de funciones
+void secuencia(char modo, int largo_arreglo, Vectores_de_resultados &resultados, Datos configuracion);
 
 // Main
 int main(int argc, char** argv) {
@@ -27,94 +51,69 @@ int main(int argc, char** argv) {
     // seed num random (Quizas pasar como parametro, como recomendo el profe Cristobal)
     srand(time(nullptr));  
 
+    Datos configuracion = Datos(largo_arreglo);   // Estructura con los datos para la creacion de los arreglos (Es mas ordenado que pasar todos lo datos por separado)
+
     // Cargar var de entorno
     const int iteraciones = get_env_int("ITERACIONES");
-    const int epsilon = get_env_int("EPSILON");    
-    const double mean = get_env_double("MEAN");  
-    const double stddev = get_env_double("STDDEV");
 
-    // Vector de los resultados(tiempos) de la busqueda del numero
-    vector<double> resultados_lineal;   
-    vector<double> resultados_normal;   
+    // Vectores de resultados
+    Vectores_de_resultados resultados_arreglo_lineal;
+    Vectores_de_resultados resultados_arreglo_normal;
 
-    vector<double> tiempo_arr_lineal;   
-    vector<double> tiempo_arr_normal;   
+    cout << "PID del programa: " << getpid() << endl;
 
-    // Loop de la ejecucion principal
     cout << "Ejecutando" << endl;
-    for (int i = 0; i < iteraciones; i++) {
-        // cout << "Iteracion: " << i+1 << endl;
-        secuencia_lineal(largo_arreglo, epsilon, resultados_lineal,tiempo_arr_lineal);
-        secuencia_normal(largo_arreglo, mean, stddev, resultados_normal,tiempo_arr_normal);
-    }
+    for (int i = 0; i < iteraciones; i++){
+        secuencia('l', largo_arreglo, resultados_arreglo_lineal, configuracion);
+        secuencia('n', largo_arreglo, resultados_arreglo_normal, configuracion);
+    } 
     cout << "Ejecucion Terminada" << endl;
 
     // Path archivo .CSV de los resultados
-    string path_tiempo_busqueda = crear_file_name("normal","busqueda");
+    string path_tiempo_busqueda = crear_file_name("normal","busqueda_binaria");
     crear_archivo_txt(path_tiempo_busqueda);
-    escribir_resultados_csv(resultados_lineal,resultados_normal, path_tiempo_busqueda, largo_arreglo);
+    escribir_resultados_csv(resultados_arreglo_lineal.tiempo_busqueda_binaria,resultados_arreglo_normal.tiempo_busqueda_binaria, path_tiempo_busqueda, largo_arreglo);
 
-    string path_tiempo_creacion = crear_file_name("normal","creacion");
+    string path_tiempo_creacion = crear_file_name("normal","creacion_arreglos");
     crear_archivo_txt(path_tiempo_creacion);
-    escribir_resultados_csv(tiempo_arr_lineal,tiempo_arr_normal, path_tiempo_creacion, largo_arreglo);
+    escribir_resultados_csv(resultados_arreglo_lineal.tiempo_creacion_arreglos,resultados_arreglo_normal.tiempo_creacion_arreglos, path_tiempo_creacion, largo_arreglo);
 
     return 0;
 };
 
+// Secuencia principal, Como se aplican los mismo procesos a los arreglos lineal y normal solo estos serian lo que cambia en cada experimento
+void secuencia(char modo, int largo_arreglo, Vectores_de_resultados &resultados, Datos configuracion){
+    // Declarar los arreglos
+    int *arreglo = new int[largo_arreglo];
 
-// Tiempo de la busqueda binaria con el arreglo lineal
-void secuencia_lineal(int largo_arreglo, int epsilon, vector<double>& resultados_lineal, vector<double>& tiempo_arr_lineal){
+    // Crear los arreglos dependiendo del modo (l: lineal, n: normal)
+    Time_Interval* tiempo_creacion_arreglo = new Time_Interval();   // Calculamos el tiempo de cracion
+    switch (modo){
+        case ('l'):
+            crear_ArrLineal(largo_arreglo, arreglo, configuracion.epsilon);     // Crea el arreglo lineal
+            break;  
+        case ('n'):
+            crear_ArrNormal(largo_arreglo, arreglo, configuracion.mean, configuracion.stddev);  // Crea el arreglo normal
+            break;
+        default:
+            cerr << "Modo seleccionado invalido" << endl;
+            exit(EXIT_FAILURE);
+            break;
+    }
+    double duracion_creacion_arreglo = tiempo_creacion_arreglo->tiempo_transcurrido();
+    resultados.tiempo_creacion_arreglos.push_back(duracion_creacion_arreglo);
 
-    // Crear nuevo Arreglo
-    Time_Interval* Tiempo_creacion = new Time_Interval();
-    int *Arr_lineal = new int[largo_arreglo]; 
-    double duration = Tiempo_creacion->tiempo_transcurrido();
-    tiempo_arr_lineal.push_back(duration);
+    // Define un num_random a buscar entre el rango del arreglo
+    int num_buscado = experimental::randint(int(arreglo[0]), int(arreglo[largo_arreglo-1]));    
 
-    delete Tiempo_creacion;
-
-    // Rellenar con randoms
-    crear_ArrLineal(largo_arreglo, Arr_lineal, epsilon);
-    
-    // Num buscado random entre los extremos del arreglo
-    int numero_buscado = experimental::randint(int(Arr_lineal[0]), int(Arr_lineal[largo_arreglo-1]));
-
-    // Busqueda
-    Time_Interval* Tiempo = new Time_Interval();
-    binary_Search(Arr_lineal, largo_arreglo, numero_buscado);
-    duration = Tiempo->tiempo_transcurrido();
-    resultados_lineal.push_back(duration);
-
-    // Liberar espacio
-    delete Tiempo;  
-    delete[] Arr_lineal;
-};
-
-
-// Tiempo de la busqueda binaria con el arreglo normal
-void secuencia_normal(int largo_arreglo, double mean, double stddev, vector<double>& resultados_normal, vector<double>& tiempo_arr_normal){
-
-    // Crear nuevo Arreglo
-    Time_Interval* Tiempo_creacion = new Time_Interval();
-    int *Arr_normal = new int[largo_arreglo];
-    double duration = Tiempo_creacion->tiempo_transcurrido();
-    tiempo_arr_normal.push_back(duration);
-
-    delete Tiempo_creacion;
-
-    // Rellenar con randoms
-    crear_ArrNormal(largo_arreglo, Arr_normal, mean, stddev);
-
-    // Num buscado random entre los extremos del arreglo
-    int numero_buscado = experimental::randint(int(Arr_normal[0]), int(Arr_normal[largo_arreglo-1]));
-
-    // Busqueda binaria
-    Time_Interval* Tiempo = new Time_Interval();
-    binary_Search(Arr_normal, largo_arreglo, numero_buscado);
-    duration = Tiempo->tiempo_transcurrido();
-    resultados_normal.push_back(duration);
+    // Calculo del tiempo de la busqueda binaria del intervalo en el sample
+    Time_Interval* tiempo_busqueda_binaria = new Time_Interval();
+    pair<int, int> intervalo = binary_Search_Intervalos(arreglo, largo_arreglo, num_buscado);  
+    double duration_busqueda_binaria = tiempo_busqueda_binaria->tiempo_transcurrido();
+    // cout << "Busqueda binaria: " << duration_busqueda_binaria << endl;
+    resultados.tiempo_busqueda_binaria.push_back(duration_busqueda_binaria);
 
     // Liberar espacio
-    delete Tiempo;
-    delete[] Arr_normal;
+    delete tiempo_busqueda_binaria;
+    delete[] arreglo;    
 };

@@ -78,8 +78,8 @@ unordered_map<int, string> padding_codigos(const unordered_map<int, string>& huf
 }
 
 // Calcula las frecuencias de los numeros en el gap_arr
-map<int,int> frecuencias_gap_arr(int gap_arr[],int gap_lenght){
-    map<int,int> frecuencias;
+unordered_map<int,int> frecuencias_gap_arr(int gap_arr[],int gap_lenght){
+    unordered_map<int,int> frecuencias;
 
     for (int i=0 ; i < gap_lenght; i++ ){
         if (frecuencias.count(gap_arr[i]) > 0){
